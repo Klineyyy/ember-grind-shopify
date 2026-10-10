@@ -1,0 +1,59 @@
+<section class="section promo" style="--promo-bg: {{ section.settings.background }}">
+  <div class="page-width promo__inner">
+    <div class="promo__copy">
+      <p class="eyebrow eyebrow--light">{{ section.settings.eyebrow }}</p>
+      <h2>{{ section.settings.heading }}</h2>
+      <div class="rte">{{ section.settings.text }}</div>
+      {%- if section.settings.button_label != blank -%}
+        <a class="button button--ember" href="{{ section.settings.button_link | default: routes.all_products_collection_url }}">
+          {{- section.settings.button_label -}}
+        </a>
+      {%- endif -%}
+    </div>
+    <ul class="promo__perks">
+      {%- for block in section.blocks -%}
+        <li class="promo__perk" {{ block.shopify_attributes }}>
+          <span class="promo__check">{% render 'icon', name: 'check' %}</span>
+          <div>
+            <strong>{{ block.settings.title }}</strong>
+            <p>{{ block.settings.text }}</p>
+          </div>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Subscription promo",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The Roast Club" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Never run out on a Monday again." },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>A rotating single origin every two or four weeks, ground for your brewer.</p>" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Start a subscription" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "color", "id": "background", "label": "Background", "default": "#1E1A17" }
+  ],
+  "blocks": [
+    {
+      "type": "perk",
+      "name": "Perk",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "10% off every bag" },
+        { "type": "text", "id": "text", "label": "Text", "default": "Members price on everything, forever." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Subscription promo",
+      "blocks": [
+        { "type": "perk" },
+        { "type": "perk", "settings": { "title": "Skip or pause anytime", "text": "One click from your account. No calls." } },
+        { "type": "perk", "settings": { "title": "Roasted to order", "text": "Shipped within 48 hours of roasting." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

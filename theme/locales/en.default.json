@@ -1,0 +1,66 @@
+{
+  "accessibility": {
+    "skip_to_content": "Skip to content",
+    "close": "Close",
+    "open_cart": "Open cart",
+    "open_menu": "Open menu"
+  },
+  "general": {
+    "shop_all": "Shop all coffee",
+    "view_all": "View all",
+    "back_home": "Back to the roastery",
+    "search": "Search"
+  },
+  "products": {
+    "add_to_cart": "Add to cart",
+    "sold_out": "Sold out",
+    "unavailable": "Unavailable",
+    "quantity": "Quantity",
+    "roast_level": "Roast level",
+    "tasting_notes": "Tasting notes",
+    "origin": "Origin",
+    "process": "Process",
+    "altitude": "Altitude",
+    "from_price": "From {{ price }}"
+  },
+  "collections": {
+    "sort_by": "Sort by",
+    "filter": "Filter",
+    "clear": "Clear all",
+    "empty": "No coffees match those filters yet.",
+    "count": {
+      "one": "{{ count }} product",
+      "other": "{{ count }} products"
+    }
+  },
+  "cart": {
+    "title": "Your bag",
+    "empty": "Your bag is empty. Let’s fix that.",
+    "subtotal": "Subtotal",
+    "checkout": "Check out",
+    "remove": "Remove",
+    "note": "Order note",
+    "taxes": "Taxes and shipping calculated at checkout.",
+    "free_shipping_remaining": "You’re {{ amount }} away from free shipping",
+    "free_shipping_unlocked": "Free shipping unlocked ☕",
+    "continue": "Keep browsing"
+  },
+  "search": {
+    "title": "Search",
+    "placeholder": "Search coffee, origins, gear…",
+    "results": {
+      "one": "{{ count }} result for “{{ terms }}”",
+      "other": "{{ count }} results for “{{ terms }}”"
+    },
+    "none": "Nothing found for “{{ terms }}”."
+  },
+  "not_found": {
+    "title": "This page went cold",
+    "text": "We couldn’t find what you were looking for."
+  },
+  "newsletter": {
+    "label": "Email",
+    "submit": "Join",
+    "success": "Thanks for subscribing!"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "header",
+  "name": "Header group",
+  "sections": {
+    "header": {
+      "type": "header",
+      "settings": {
+        "announcement": "Roasted every Tuesday · Free shipping over $50",
+        "menu": "main-menu"
+      }
+    }
+  },
+  "order": ["header"]
+}

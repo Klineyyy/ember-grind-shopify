@@ -1,0 +1,10 @@
+<section class="page-width empty-page">
+  <p class="empty-page__code" aria-hidden="true">404</p>
+  <h1>{{ 'not_found.title' | t }}</h1>
+  <p>{{ 'not_found.text' | t }}</p>
+  <a class="button button--ember" href="{{ routes.root_url }}">{{ 'general.back_home' | t }}</a>
+</section>
+
+{% schema %}
+{ "name": "404" }
+{% endschema %}

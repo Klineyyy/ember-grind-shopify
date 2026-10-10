@@ -1,0 +1,57 @@
+<footer class="site-footer">
+  <div class="page-width site-footer__grid">
+    <div class="site-footer__brand">
+      <p class="logo">
+        <span class="logo__mark" aria-hidden="true">{% render 'icon', name: 'bean' %}</span>
+        <span class="logo__text">{{ shop.name }}</span>
+      </p>
+      {%- if section.settings.blurb != blank -%}
+        <div class="rte">{{ section.settings.blurb }}</div>
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.menu != blank -%}
+      <nav aria-label="Footer">
+        <h2 class="site-footer__heading">{{ section.settings.menu.title }}</h2>
+        <ul class="site-footer__links">
+          {%- for link in section.settings.menu.links -%}
+            <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    {%- endif -%}
+
+    <div>
+      <h2 class="site-footer__heading">{{ section.settings.newsletter_heading }}</h2>
+      {%- form 'customer', id: 'FooterNewsletter', class: 'newsletter' -%}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <label class="visually-hidden" for="FooterEmail">{{ 'newsletter.label' | t }}</label>
+        <input id="FooterEmail" type="email" name="contact[email]" placeholder="you@example.com" required>
+        <button type="submit" class="button button--ember">{{ 'newsletter.submit' | t }}</button>
+        {%- if form.posted_successfully? -%}
+          <p class="newsletter__success">{{ 'newsletter.success' | t }}</p>
+        {%- endif -%}
+      {%- endform -%}
+    </div>
+  </div>
+  <div class="page-width site-footer__legal">
+    <small>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. Roasted with care.</small>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "class": "section-footer",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "blurb",
+      "label": "Brand blurb",
+      "default": "<p>Small-batch specialty coffee, roasted every Tuesday and shipped within 48 hours. Direct-trade where we can, transparent always.</p>"
+    },
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "footer" },
+    { "type": "text", "id": "newsletter_heading", "label": "Newsletter heading", "default": "Fresh roast drops" }
+  ]
+}
+{% endschema %}

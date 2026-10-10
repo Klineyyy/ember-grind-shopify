@@ -1,0 +1,76 @@
+{%- comment -%}
+  Flavour radar for the current product, drawn server-side in Liquid as SVG
+  from the coffee.flavor_profile JSON metafield, e.g.
+  {"sweetness":7,"acidity":8,"body":4,"bitterness":2,"fruit":9}
+  No JS needed; the polygon animates in with CSS.
+{%- endcomment -%}
+{%- assign profile = product.metafields.coffee.flavor_profile.value -%}
+{%- if profile != blank -%}
+  {%- assign keys = 'sweetness,acidity,body,bitterness,fruit' | split: ',' -%}
+  {%- assign labels = 'Sweetness,Acidity,Body,Bitterness,Fruit' | split: ',' -%}
+  {%- comment -%} Unit vectors for 5 axes starting at 12 o'clock (−90°, −18°, 54°, 126°, 198°) {%- endcomment -%}
+  {%- assign ux = '0,0.9511,0.5878,-0.5878,-0.9511' | split: ',' -%}
+  {%- assign uy = '-1,-0.309,0.809,0.809,-0.309' | split: ',' -%}
+
+  {%- capture points -%}
+    {%- for key in keys -%}
+      {%- assign value = profile[key] | default: 0 | at_most: 10 | at_least: 0 -%}
+      {%- assign r = value | times: 8.0 -%}
+      {%- assign x = ux[forloop.index0] | times: r | plus: 120 -%}
+      {%- assign y = uy[forloop.index0] | times: r | plus: 110 -%}
+      {{ x | round: 1 }},{{ y | round: 1 }}{% unless forloop.last %} {% endunless %}
+    {%- endfor -%}
+  {%- endcapture -%}
+
+  <section class="section page-width flavor-profile">
+    <div class="flavor-profile__layout">
+      <div>
+        <p class="eyebrow">{{ section.settings.eyebrow }}</p>
+        <h2>{{ section.settings.heading }}</h2>
+        <p class="flavor-profile__text">{{ section.settings.text }}</p>
+        <ul class="flavor-bars">
+          {%- for key in keys -%}
+            {%- assign value = profile[key] | default: 0 -%}
+            <li>
+              <span>{{ labels[forloop.index0] }}</span>
+              <span class="flavor-bars__track"><span style="width: {{ value | times: 10 }}%"></span></span>
+              <span class="flavor-bars__value">{{ value }}/10</span>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+
+      <svg class="flavor-radar" viewBox="0 0 240 220" role="img" aria-label="Flavour profile chart for {{ product.title | escape }}">
+        {%- for ring in (1..5) -%}
+          {%- assign rr = ring | times: 16.0 -%}
+          <polygon class="flavor-radar__ring" points="
+            {%- for i in (0..4) -%}
+              {{ ux[i] | times: rr | plus: 120 | round: 1 }},{{ uy[i] | times: rr | plus: 110 | round: 1 }}{% unless forloop.last %} {% endunless %}
+            {%- endfor -%}"/>
+        {%- endfor -%}
+        {%- for i in (0..4) -%}
+          <line class="flavor-radar__axis" x1="120" y1="110" x2="{{ ux[i] | times: 80 | plus: 120 }}" y2="{{ uy[i] | times: 80 | plus: 110 }}"/>
+          <text
+            class="flavor-radar__label"
+            x="{{ ux[i] | times: 98 | plus: 120 }}"
+            y="{{ uy[i] | times: 96 | plus: 114 }}"
+            text-anchor="middle"
+          >{{ labels[i] }}</text>
+        {%- endfor -%}
+        <polygon class="flavor-radar__shape" points="{{ points | strip }}"/>
+      </svg>
+    </div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Flavour profile",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "In the cup" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Flavour profile" },
+    { "type": "text", "id": "text", "label": "Text", "default": "Scored by our roasting team on the cupping table, 0–10." }
+  ],
+  "enabled_on": { "templates": ["product"] }
+}
+{% endschema %}

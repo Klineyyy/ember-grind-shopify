@@ -1,0 +1,40 @@
+{%- assign collection = section.settings.collection -%}
+<section class="section page-width">
+  <div class="section-heading">
+    <div>
+      {%- if section.settings.eyebrow != blank -%}<p class="eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+      <h2>{{ section.settings.heading }}</h2>
+    </div>
+    {%- if collection != blank -%}
+      <a class="link-arrow" href="{{ collection.url }}">{{ 'general.view_all' | t }} {% render 'icon', name: 'arrow' %}</a>
+    {%- endif -%}
+  </div>
+
+  <div class="product-grid">
+    {%- if collection != blank and collection.products_count > 0 -%}
+      {%- for product in collection.products limit: section.settings.limit -%}
+        {% render 'product-card', product: product %}
+      {%- endfor -%}
+    {%- else -%}
+      {%- for i in (1..4) -%}
+        <article class="product-card product-card--placeholder">
+          <div class="product-card__media">{{ 'product-1' | placeholder_svg_tag: 'placeholder' }}</div>
+          <div class="product-card__body"><h3 class="product-card__title">Your coffee here</h3></div>
+        </article>
+      {%- endfor -%}
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Featured collection",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "This week’s roast" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Fresh off the drum" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "limit", "label": "Products to show", "min": 2, "max": 12, "step": 1, "default": 4 }
+  ],
+  "presets": [{ "name": "Featured collection" }]
+}
+{% endschema %}

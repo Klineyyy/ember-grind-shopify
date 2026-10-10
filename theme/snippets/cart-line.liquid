@@ -1,0 +1,40 @@
+{%- comment -%}
+  One cart line, shared by the cart page and the cart drawer.
+  Accepts: item, index (1-based line number)
+{%- endcomment -%}
+<li class="cart-line">
+  <a class="cart-line__media" href="{{ item.url }}">
+    {%- if item.image -%}
+      {{ item.image | image_url: width: 200 | image_tag: loading: 'lazy', alt: item.title }}
+    {%- else -%}
+      {% render 'coffee-bag', product: item.product %}
+    {%- endif -%}
+  </a>
+  <div class="cart-line__info">
+    <a class="cart-line__title" href="{{ item.url }}">{{ item.product.title }}</a>
+    {%- unless item.product.has_only_default_variant -%}
+      <p class="cart-line__variant">{{ item.variant.title }}</p>
+    {%- endunless -%}
+    {%- for property in item.properties -%}
+      {%- assign first_char = property.first | slice: 0 -%}
+      {%- if property.last != blank and first_char != '_' -%}
+        <p class="cart-line__variant">{{ property.first }}: {{ property.last }}</p>
+      {%- endif -%}
+    {%- endfor -%}
+    {%- if item.properties._bundle -%}
+      <span class="chip chip--small">{{ item.properties._bundle }}</span>
+    {%- endif -%}
+    <div class="qty">
+      <button type="button" class="qty__btn" data-line="{{ index }}" data-line-change="{{ item.quantity | minus: 1 }}" aria-label="Decrease quantity">−</button>
+      <span class="qty__value">{{ item.quantity }}</span>
+      <button type="button" class="qty__btn" data-line="{{ index }}" data-line-change="{{ item.quantity | plus: 1 }}" aria-label="Increase quantity">+</button>
+      <button type="button" class="cart-line__remove" data-line="{{ index }}" data-line-change="0">{{ 'cart.remove' | t }}</button>
+    </div>
+  </div>
+  <div class="cart-line__price">
+    {%- if item.original_line_price > item.final_line_price -%}
+      <s class="price__compare">{{ item.original_line_price | money }}</s>
+    {%- endif -%}
+    {{ item.final_line_price | money }}
+  </div>
+</li>

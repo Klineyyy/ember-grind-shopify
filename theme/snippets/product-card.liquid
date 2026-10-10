@@ -1,0 +1,44 @@
+{%- comment -%}
+  Product card. Accepts: product
+{%- endcomment -%}
+{%- assign coffee = product.metafields.coffee -%}
+<article class="product-card">
+  <a href="{{ product.url }}" class="product-card__media">
+    {%- if product.featured_image -%}
+      {%- assign image_alt = product.featured_image.alt | default: product.title -%}
+      {{
+        product.featured_image
+        | image_url: width: 720
+        | image_tag:
+          loading: 'lazy',
+          widths: '360, 540, 720',
+          sizes: '(min-width: 990px) 25vw, (min-width: 600px) 45vw, 90vw',
+          alt: image_alt
+      }}
+    {%- else -%}
+      {% render 'coffee-bag', product: product %}
+    {%- endif -%}
+    {%- if product.available == false -%}
+      <span class="badge badge--muted">{{ 'products.sold_out' | t }}</span>
+    {%- elsif product.compare_at_price > product.price -%}
+      <span class="badge">Sale</span>
+    {%- endif -%}
+  </a>
+  <div class="product-card__body">
+    {%- if coffee.origin != blank -%}
+      <p class="eyebrow">{{ coffee.origin }}</p>
+    {%- elsif product.type != blank -%}
+      <p class="eyebrow">{{ product.type }}</p>
+    {%- endif -%}
+    <h3 class="product-card__title">
+      <a href="{{ product.url }}">{{ product.title }}</a>
+    </h3>
+    {%- if coffee.tasting_notes != blank -%}
+      <p class="product-card__notes">{{ coffee.tasting_notes.value | join: ' · ' }}</p>
+    {%- endif -%}
+    <div class="product-card__meta">
+      {% render 'price', product: product %}
+      {% render 'roast-meter', level: coffee.roast_level.value %}
+    </div>
+  </div>
+</article>

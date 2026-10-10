@@ -1,0 +1,53 @@
+{%- comment -%}
+  Static section rendered in the layout and re-fetched via
+  /?section_id=cart-drawer after every cart change (see global.js).
+{%- endcomment -%}
+<aside class="cart-drawer" data-cart-drawer aria-hidden="true" aria-label="{{ 'cart.title' | t }}">
+  <div class="cart-drawer__overlay" data-cart-close></div>
+  <div class="cart-drawer__panel" role="dialog" aria-modal="true" aria-labelledby="CartDrawerTitle">
+    <div class="cart-drawer__inner" data-cart-drawer-inner>
+      <header class="cart-drawer__head">
+        <h2 id="CartDrawerTitle">{{ 'cart.title' | t }} <span>({{ cart.item_count }})</span></h2>
+        <button type="button" class="icon-button" data-cart-close aria-label="{{ 'accessibility.close' | t }}">
+          {% render 'icon', name: 'close' %}
+        </button>
+      </header>
+
+      {% render 'free-shipping-bar' %}
+
+      {%- if cart.item_count > 0 -%}
+        <ul class="cart-lines">
+          {%- for item in cart.items -%}
+            {% render 'cart-line', item: item, index: forloop.index %}
+          {%- endfor -%}
+        </ul>
+        <footer class="cart-drawer__foot">
+          {%- for discount in cart.discount_applications -%}
+            <p class="cart-discount">{{ discount.title }} <span>−{{ discount.total_allocated_amount | money }}</span></p>
+          {%- endfor -%}
+          <p class="cart-total">
+            <span>{{ 'cart.subtotal' | t }}</span>
+            <strong>{{ cart.total_price | money }}</strong>
+          </p>
+          <p class="cart-taxes">{{ 'cart.taxes' | t }}</p>
+          <form action="{{ routes.cart_url }}" method="post">
+            <button type="submit" name="checkout" class="button button--ember button--block">{{ 'cart.checkout' | t }}</button>
+          </form>
+          <a class="cart-drawer__view" href="{{ routes.cart_url }}">View full bag</a>
+        </footer>
+      {%- else -%}
+        <div class="cart-empty">
+          <p>{{ 'cart.empty' | t }}</p>
+          <a class="button button--ember" href="{{ routes.root_url }}#brew-quiz" data-cart-close-link>Take the brew quiz</a>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</aside>
+
+{% schema %}
+{
+  "name": "Cart drawer",
+  "settings": []
+}
+{% endschema %}

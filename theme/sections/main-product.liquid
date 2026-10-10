@@ -1,0 +1,127 @@
+{%- assign product_form_id = 'ProductForm-' | append: section.id -%}
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign coffee = product.metafields.coffee -%}
+
+<section class="page-width product" data-section="{{ section.id }}">
+  <div class="product__media">
+    {%- if product.media.size > 0 -%}
+      <div class="product__gallery">
+        {%- for media in product.media limit: 6 -%}
+          <div class="product__media-item{% if forloop.first %} is-featured{% endif %}">
+            {{
+              media.preview_image
+              | image_url: width: 1200
+              | image_tag:
+                loading: 'lazy',
+                widths: '400, 700, 1000, 1200',
+                sizes: '(min-width: 990px) 50vw, 100vw',
+                alt: media.alt
+            }}
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      {% render 'coffee-bag', product: product %}
+    {%- endif -%}
+  </div>
+
+  <div class="product__info">
+    {%- if coffee.origin != blank -%}
+      <p class="eyebrow">{{ coffee.origin }}{% if coffee.process != blank %} · {{ coffee.process }}{% endif %}</p>
+    {%- endif -%}
+    <h1 class="product__title">{{ product.title }}</h1>
+
+    <div class="product__price" data-price-for="{{ section.id }}">
+      {% render 'price', product: product, variant: current_variant %}
+    </div>
+
+    {%- if coffee.roast_level != blank -%}
+      {% render 'roast-meter', level: coffee.roast_level.value, show_label: true %}
+    {%- endif -%}
+
+    {%- if coffee.tasting_notes != blank -%}
+      <ul class="note-chips" aria-label="{{ 'products.tasting_notes' | t }}">
+        {%- for note in coffee.tasting_notes.value -%}
+          <li>{{ note }}</li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+
+    {%- form 'product', product, id: product_form_id, class: 'product-form', data-product-form: 'true' -%}
+      <input type="hidden" name="id" value="{{ current_variant.id }}">
+
+      {%- unless product.has_only_default_variant -%}
+        <div class="variant-picker" data-variant-picker data-form="{{ product_form_id }}" data-section="{{ section.id }}">
+          {%- for option in product.options_with_values -%}
+            <fieldset class="variant-picker__option">
+              <legend>{{ option.name }}</legend>
+              <div class="pills">
+                {%- for value in option.values -%}
+                  <label class="pill">
+                    <input
+                      type="radio"
+                      class="visually-hidden"
+                      name="option-{{ option.position }}"
+                      value="{{ value | escape }}"
+                      {% if option.selected_value == value %}checked{% endif %}
+                    >
+                    <span>{{ value }}</span>
+                  </label>
+                {%- endfor -%}
+              </div>
+            </fieldset>
+          {%- endfor -%}
+          <script type="application/json" data-variants>
+            {{ product.variants | json }}
+          </script>
+        </div>
+      {%- endunless -%}
+
+      <div class="product-form__row">
+        <label class="visually-hidden" for="Quantity-{{ section.id }}">{{ 'products.quantity' | t }}</label>
+        <input class="qty-input" id="Quantity-{{ section.id }}" type="number" name="quantity" value="1" min="1" max="20">
+        <button
+          type="submit"
+          class="button button--ember button--block"
+          data-add="{{ 'products.add_to_cart' | t }}"
+          data-sold-out="{{ 'products.sold_out' | t }}"
+          data-unavailable="{{ 'products.unavailable' | t }}"
+          {% unless current_variant.available %}disabled{% endunless %}
+        >
+          <span data-button-label>
+            {%- if current_variant.available -%}{{ 'products.add_to_cart' | t }}{%- else -%}{{ 'products.sold_out' | t }}{%- endif -%}
+          </span>
+        </button>
+      </div>
+      <p class="form-error" data-form-error role="alert" hidden></p>
+    {%- endform -%}
+
+    {%- if section.settings.show_roast_date -%}
+      <p class="product__fresh">
+        {%- render 'icon', name: 'check' -%}
+        Roasted this Tuesday, ships within 48 hours
+      </p>
+    {%- endif -%}
+
+    {%- if coffee.origin != blank or coffee.altitude != blank -%}
+      <dl class="spec-list">
+        {%- if coffee.origin != blank -%}<div><dt>{{ 'products.origin' | t }}</dt><dd>{{ coffee.origin }}</dd></div>{%- endif -%}
+        {%- if coffee.process != blank -%}<div><dt>{{ 'products.process' | t }}</dt><dd>{{ coffee.process }}</dd></div>{%- endif -%}
+        {%- if coffee.altitude != blank -%}<div><dt>{{ 'products.altitude' | t }}</dt><dd>{{ coffee.altitude }}</dd></div>{%- endif -%}
+      </dl>
+    {%- endif -%}
+
+    <div class="product__description rte">{{ product.description }}</div>
+  </div>
+</section>
+
+<script src="{{ 'variant-picker.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Product information",
+  "settings": [
+    { "type": "checkbox", "id": "show_roast_date", "label": "Show freshness note", "default": true }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,14 @@
+{
+  "current": "Default",
+  "presets": {
+    "Default": {
+      "color_ink": "#1E1A17",
+      "color_crema": "#F3E9DC",
+      "color_ember": "#E0662B",
+      "color_roast": "#5A3A2A",
+      "color_sage": "#6F8A63",
+      "free_shipping_threshold": 50,
+      "cart_drawer_enabled": true
+    }
+  }
+}

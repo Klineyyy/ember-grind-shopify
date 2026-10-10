@@ -1,0 +1,28 @@
+{%- comment -%}
+  Free shipping progress. Threshold comes from theme settings (whole currency units).
+{%- endcomment -%}
+{%- assign threshold = settings.free_shipping_threshold | times: 100 -%}
+{%- if threshold > 0 -%}
+  {%- assign remaining = threshold | minus: cart.total_price -%}
+  {%- assign progress = cart.total_price | times: 100 | divided_by: threshold -%}
+  {%- if progress > 100 -%}{%- assign progress = 100 -%}{%- endif -%}
+  <div class="shipping-bar{% if remaining <= 0 %} is-complete{% endif %}">
+    <p class="shipping-bar__text">
+      {%- if remaining > 0 -%}
+        {%- assign remaining_money = remaining | money -%}
+        {{ 'cart.free_shipping_remaining' | t: amount: remaining_money }}
+      {%- else -%}
+        {{ 'cart.free_shipping_unlocked' | t }}
+      {%- endif -%}
+    </p>
+    <div
+      class="shipping-bar__track"
+      role="progressbar"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow="{{ progress }}"
+    >
+      <span class="shipping-bar__fill" style="width: {{ progress }}%"></span>
+    </div>
+  </div>
+{%- endif -%}

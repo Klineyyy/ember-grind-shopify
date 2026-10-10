@@ -1,0 +1,23 @@
+{%- comment -%}
+  Five-bean roast meter. Accepts: level (1-5), show_label (bool)
+{%- endcomment -%}
+{%- assign level = level | default: 0 | plus: 0 -%}
+{%- if level > 0 -%}
+  {%- case level -%}
+    {%- when 1 -%}{%- assign roast_label = 'Light' -%}
+    {%- when 2 -%}{%- assign roast_label = 'Light–Medium' -%}
+    {%- when 3 -%}{%- assign roast_label = 'Medium' -%}
+    {%- when 4 -%}{%- assign roast_label = 'Medium–Dark' -%}
+    {%- else -%}{%- assign roast_label = 'Dark' -%}
+  {%- endcase -%}
+  <div class="roast-meter" style="--level: {{ level }}" aria-label="{{ 'products.roast_level' | t }}: {{ roast_label }} ({{ level }}/5)">
+    <span class="roast-meter__beans" aria-hidden="true">
+      {%- for i in (1..5) -%}
+        <span class="roast-meter__bean{% if i <= level %} is-filled{% endif %}" style="--i: {{ i }}"></span>
+      {%- endfor -%}
+    </span>
+    {%- if show_label -%}
+      <span class="roast-meter__label">{{ roast_label }}</span>
+    {%- endif -%}
+  </div>
+{%- endif -%}

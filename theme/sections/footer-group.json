@@ -1,0 +1,14 @@
+{
+  "type": "footer",
+  "name": "Footer group",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "settings": {
+        "menu": "footer",
+        "newsletter_heading": "Fresh roast drops"
+      }
+    }
+  },
+  "order": ["footer"]
+}

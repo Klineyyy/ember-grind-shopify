@@ -1,0 +1,31 @@
+{%- comment -%}
+  Brand tokens. Colors come from theme settings so merchants can tweak them
+  in the theme editor; everything else in base.css reads these variables.
+{%- endcomment -%}
+<style>
+  :root {
+    --c-ink: {{ settings.color_ink }};
+    --c-crema: {{ settings.color_crema }};
+    --c-ember: {{ settings.color_ember }};
+    --c-roast: {{ settings.color_roast }};
+    --c-sage: {{ settings.color_sage }};
+    --c-paper: #fffaf3;
+    --c-line: rgba(30, 26, 23, 0.12);
+    --c-muted: rgba(30, 26, 23, 0.64);
+
+    --roast-1: #c9a27a;
+    --roast-2: #a8754a;
+    --roast-3: #7b4a2b;
+    --roast-4: #55301b;
+    --roast-5: #2e1a10;
+
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+    --radius: 14px;
+    --radius-pill: 999px;
+    --page-width: 1240px;
+    --gutter: clamp(16px, 4vw, 40px);
+    --shadow: 0 10px 30px rgba(30, 26, 23, 0.12);
+  }
+</style>

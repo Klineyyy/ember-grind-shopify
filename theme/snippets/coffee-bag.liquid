@@ -1,0 +1,15 @@
+{%- comment -%}
+  Illustrated coffee bag used as a branded placeholder when a product has no
+  photo. Bag color follows roast level so the grid still reads at a glance.
+  Accepts: product
+{%- endcomment -%}
+{%- assign level = product.metafields.coffee.roast_level.value | default: 3 -%}
+<div class="coffee-bag" style="--bag: var(--roast-{{ level }})" role="img" aria-label="{{ product.title | escape }}">
+  <svg viewBox="0 0 200 240" aria-hidden="true">
+    <path d="M40 30h120l12 190a8 8 0 0 1-8 8H36a8 8 0 0 1-8-8L40 30Z" fill="var(--bag)"/>
+    <path d="M40 30h120l-6-16H46l-6 16Z" fill="rgba(0,0,0,.25)"/>
+    <rect x="58" y="90" width="84" height="84" rx="8" fill="var(--c-paper)"/>
+    <ellipse cx="100" cy="120" rx="12" ry="17" transform="rotate(35 100 120)" fill="var(--bag)"/>
+  </svg>
+  <span class="coffee-bag__label">{{ product.title | truncate: 28 }}</span>
+</div>

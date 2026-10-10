@@ -1,0 +1,101 @@
+{%- comment -%}
+  Tabbed brew guide. Each block is a brew method with recipe stats and steps.
+  Tabs follow the WAI-ARIA tabs pattern (arrow keys move between tabs).
+{%- endcomment -%}
+<section class="section page-width brew-guide" data-tabs>
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">{{ section.settings.eyebrow }}</p>
+      <h2>{{ section.settings.heading }}</h2>
+    </div>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="{{ section.settings.heading | escape }}">
+    {%- for block in section.blocks -%}
+      <button
+        type="button"
+        role="tab"
+        class="tab"
+        id="Tab-{{ block.id }}"
+        aria-controls="Panel-{{ block.id }}"
+        aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+        tabindex="{% if forloop.first %}0{% else %}-1{% endif %}"
+        {{ block.shopify_attributes }}
+      >
+        {{ block.settings.method }}
+      </button>
+    {%- endfor -%}
+  </div>
+
+  {%- for block in section.blocks -%}
+    <div
+      class="brew-panel"
+      role="tabpanel"
+      id="Panel-{{ block.id }}"
+      aria-labelledby="Tab-{{ block.id }}"
+      {% unless forloop.first %}hidden{% endunless %}
+    >
+      <dl class="brew-stats">
+        <div><dt>Grind</dt><dd>{{ block.settings.grind }}</dd></div>
+        <div><dt>Ratio</dt><dd>{{ block.settings.ratio }}</dd></div>
+        <div><dt>Water</dt><dd>{{ block.settings.temperature }}</dd></div>
+        <div><dt>Time</dt><dd>{{ block.settings.time }}</dd></div>
+      </dl>
+      <div class="brew-steps rte">{{ block.settings.steps }}</div>
+    </div>
+  {%- endfor -%}
+</section>
+
+{% schema %}
+{
+  "name": "Brew guide",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Brew school" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Dial it in at home" }
+  ],
+  "blocks": [
+    {
+      "type": "method",
+      "name": "Brew method",
+      "settings": [
+        { "type": "text", "id": "method", "label": "Method", "default": "Pour-over" },
+        { "type": "text", "id": "grind", "label": "Grind", "default": "Medium-fine" },
+        { "type": "text", "id": "ratio", "label": "Ratio", "default": "1 : 16" },
+        { "type": "text", "id": "temperature", "label": "Water temperature", "default": "94 °C" },
+        { "type": "text", "id": "time", "label": "Brew time", "default": "3:00" },
+        { "type": "richtext", "id": "steps", "label": "Steps", "default": "<ol><li>Rinse the filter and preheat.</li><li>Bloom with twice the coffee weight in water for 40 seconds.</li><li>Pour in slow spirals to 250 g.</li></ol>" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Brew guide",
+      "blocks": [
+        { "type": "method", "settings": { "method": "Pour-over" } },
+        {
+          "type": "method",
+          "settings": {
+            "method": "Espresso",
+            "grind": "Fine",
+            "ratio": "1 : 2",
+            "temperature": "93 °C",
+            "time": "0:28",
+            "steps": "<ol><li>Dose 18 g into a warm basket.</li><li>Distribute and tamp level.</li><li>Pull 36 g in 26–30 seconds.</li></ol>"
+          }
+        },
+        {
+          "type": "method",
+          "settings": {
+            "method": "French press",
+            "grind": "Coarse",
+            "ratio": "1 : 15",
+            "temperature": "96 °C",
+            "time": "4:00",
+            "steps": "<ol><li>Add coffee and all the water.</li><li>Break the crust at 4 minutes and skim.</li><li>Press gently and pour straight away.</li></ol>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

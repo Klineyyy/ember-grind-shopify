@@ -1,0 +1,38 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Ember & Grind",
+    "theme_version": "1.0.0",
+    "theme_author": "Ember & Grind",
+    "theme_documentation_url": "https://shopify.dev/docs/storefronts/themes",
+    "theme_support_url": "https://shopify.dev"
+  },
+  {
+    "name": "Brand colors",
+    "settings": [
+      { "type": "color", "id": "color_ink", "label": "Ink (text)", "default": "#1E1A17" },
+      { "type": "color", "id": "color_crema", "label": "Crema (background)", "default": "#F3E9DC" },
+      { "type": "color", "id": "color_ember", "label": "Ember (accent)", "default": "#E0662B" },
+      { "type": "color", "id": "color_roast", "label": "Roast (secondary)", "default": "#5A3A2A" },
+      { "type": "color", "id": "color_sage", "label": "Sage (success)", "default": "#6F8A63" }
+    ]
+  },
+  {
+    "name": "Cart",
+    "settings": [
+      {
+        "type": "number",
+        "id": "free_shipping_threshold",
+        "label": "Free shipping threshold",
+        "info": "In your store currency. Set to 0 to hide the progress bar.",
+        "default": 50
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_drawer_enabled",
+        "label": "Open cart drawer after adding to cart",
+        "default": true
+      }
+    ]
+  }
+]

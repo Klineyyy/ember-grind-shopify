@@ -1,0 +1,197 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero-roast",
+      "settings": {}
+    },
+    "featured": {
+      "type": "featured-collection",
+      "settings": {
+        "collection": "coffee",
+        "limit": 4
+      }
+    },
+    "quiz": {
+      "type": "brew-quiz",
+      "settings": {
+        "collection": "coffee",
+        "gear_collection": "brewing-gear",
+        "discount_code": "SAMPLER15",
+        "discount_label": "15% off"
+      }
+    },
+    "origins": {
+      "type": "origin-map",
+      "blocks": {
+        "ethiopia": {
+          "type": "origin",
+          "settings": {
+            "country": "Ethiopia",
+            "farm": "Konga Washing Station",
+            "altitude": "1,950 masl",
+            "latitude": 6,
+            "longitude": 40,
+            "product": "ethiopia-yirgacheffe-konga"
+          }
+        },
+        "colombia": {
+          "type": "origin",
+          "settings": {
+            "country": "Colombia",
+            "farm": "Finca La Esperanza",
+            "altitude": "1,750 masl",
+            "latitude": 2,
+            "longitude": -76,
+            "product": "colombia-huila-la-esperanza",
+            "story": "<p>Third-generation farm in Huila picking Caturra and Castillo. Fermented 36 hours for a juicy, caramel-sweet cup.</p>"
+          }
+        },
+        "brazil": {
+          "type": "origin",
+          "settings": {
+            "country": "Brazil",
+            "farm": "Fazenda Santa Inês",
+            "altitude": "1,150 masl",
+            "latitude": -22,
+            "longitude": -48,
+            "product": "brazil-santa-ines",
+            "story": "<p>Natural-processed on patios in Minas Gerais. The backbone of our espresso: nutty, chocolatey, low acidity.</p>"
+          }
+        },
+        "kenya": {
+          "type": "origin",
+          "settings": {
+            "country": "Kenya",
+            "farm": "Gakuyuini Factory",
+            "altitude": "1,800 masl",
+            "latitude": 0,
+            "longitude": 36,
+            "product": "kenya-gakuyuini",
+            "story": "<p>SL28 and SL34 varietals grown on volcanic soil near Mt. Kenya. Blackcurrant and grapefruit intensity.</p>"
+          }
+        },
+        "sumatra": {
+          "type": "origin",
+          "settings": {
+            "country": "Sumatra",
+            "farm": "Kerinci Co-op",
+            "altitude": "1,500 masl",
+            "latitude": -2,
+            "longitude": 100,
+            "product": "sumatra-kerinci",
+            "story": "<p>Wet-hulled by a women-led co-operative. Earthy, cedar and dark chocolate with a syrupy body.</p>"
+          }
+        },
+        "guatemala": {
+          "type": "origin",
+          "settings": {
+            "country": "Guatemala",
+            "farm": "Finca El Injerto",
+            "altitude": "1,650 masl",
+            "latitude": 15,
+            "longitude": -92,
+            "product": "guatemala-huehuetenango",
+            "story": "<p>High-altitude Huehuetenango coffee: milk chocolate, red apple and a clean, sweet finish.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "ethiopia",
+        "colombia",
+        "brazil",
+        "kenya",
+        "sumatra",
+        "guatemala"
+      ],
+      "settings": {}
+    },
+    "brew": {
+      "type": "brew-guide",
+      "blocks": {
+        "pourover": {
+          "type": "method",
+          "settings": {
+            "method": "Pour-over"
+          }
+        },
+        "espresso": {
+          "type": "method",
+          "settings": {
+            "method": "Espresso",
+            "grind": "Fine",
+            "ratio": "1 : 2",
+            "temperature": "93 °C",
+            "time": "0:28",
+            "steps": "<ol><li>Dose 18 g into a warm basket.</li><li>Distribute and tamp level.</li><li>Pull 36 g in 26–30 seconds.</li></ol>"
+          }
+        },
+        "press": {
+          "type": "method",
+          "settings": {
+            "method": "French press",
+            "grind": "Coarse",
+            "ratio": "1 : 15",
+            "temperature": "96 °C",
+            "time": "4:00",
+            "steps": "<ol><li>Add coffee and all the water.</li><li>Break the crust at 4 minutes and skim.</li><li>Press gently and pour straight away.</li></ol>"
+          }
+        },
+        "moka": {
+          "type": "method",
+          "settings": {
+            "method": "Moka pot",
+            "grind": "Fine-medium",
+            "ratio": "1 : 7",
+            "temperature": "Off the boil",
+            "time": "~5:00",
+            "steps": "<ol><li>Fill the base with hot water to the valve.</li><li>Level the basket, don’t tamp.</li><li>Medium heat, pull off as it starts to sputter.</li></ol>"
+          }
+        }
+      },
+      "block_order": [
+        "pourover",
+        "espresso",
+        "press",
+        "moka"
+      ],
+      "settings": {}
+    },
+    "promo": {
+      "type": "subscription-promo",
+      "blocks": {
+        "p1": {
+          "type": "perk",
+          "settings": {}
+        },
+        "p2": {
+          "type": "perk",
+          "settings": {
+            "title": "Skip or pause anytime",
+            "text": "One click from your account. No calls."
+          }
+        },
+        "p3": {
+          "type": "perk",
+          "settings": {
+            "title": "Roasted to order",
+            "text": "Shipped within 48 hours of roasting."
+          }
+        }
+      },
+      "block_order": [
+        "p1",
+        "p2",
+        "p3"
+      ],
+      "settings": {}
+    }
+  },
+  "order": [
+    "hero",
+    "featured",
+    "quiz",
+    "origins",
+    "brew",
+    "promo"
+  ]
+}

@@ -1,0 +1,15 @@
+{%- comment -%}
+  Price display. Accepts: product, variant (optional)
+{%- endcomment -%}
+{%- assign target = variant | default: product.selected_or_first_available_variant -%}
+<span class="price" data-price>
+  {%- if variant == blank and product.price_varies -%}
+    {%- assign min_price = product.price_min | money -%}
+    {{ 'products.from_price' | t: price: min_price }}
+  {%- else -%}
+    {%- if target.compare_at_price > target.price -%}
+      <s class="price__compare">{{ target.compare_at_price | money }}</s>
+    {%- endif -%}
+    {{ target.price | money }}
+  {%- endif -%}
+</span>

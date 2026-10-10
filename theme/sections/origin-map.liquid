@@ -1,0 +1,105 @@
+{%- comment -%}
+  "The Coffee Belt": a stylised band between the Tropics of Cancer and
+  Capricorn where all coffee grows. Each block is a farm pinned by
+  longitude/latitude; clicking a pin reveals its story card.
+{%- endcomment -%}
+<section class="section origin-map" data-origin-map>
+  <div class="page-width">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">{{ section.settings.eyebrow }}</p>
+        <h2>{{ section.settings.heading }}</h2>
+      </div>
+      <p class="section-heading__aside">{{ section.settings.subheading }}</p>
+    </div>
+
+    <div class="origin-map__layout">
+      <div class="origin-map__canvas">
+        <svg class="origin-map__belt" viewBox="0 0 360 120" preserveAspectRatio="none" aria-hidden="true">
+          <rect x="0" y="0" width="360" height="120" fill="var(--c-roast)"/>
+          {%- comment -%} Tropic lines at ±23.4° mapped onto a 60°S–60°N frame {%- endcomment -%}
+          <line x1="0" x2="360" y1="36.6" y2="36.6" class="origin-map__tropic"/>
+          <line x1="0" x2="360" y1="60" y2="60" class="origin-map__equator"/>
+          <line x1="0" x2="360" y1="83.4" y2="83.4" class="origin-map__tropic"/>
+          <rect x="0" y="36.6" width="360" height="46.8" class="origin-map__band"/>
+        </svg>
+        <span class="origin-map__legend origin-map__legend--top">Tropic of Cancer</span>
+        <span class="origin-map__legend origin-map__legend--mid">Equator</span>
+        <span class="origin-map__legend origin-map__legend--bottom">Tropic of Capricorn</span>
+
+        {%- for block in section.blocks -%}
+          {%- assign x = block.settings.longitude | plus: 180 | times: 100.0 | divided_by: 360 -%}
+          {%- assign y = 60 | minus: block.settings.latitude | times: 100.0 | divided_by: 120 -%}
+          <button
+            type="button"
+            class="origin-pin{% if forloop.first %} is-active{% endif %}"
+            style="--x: {{ x }}%; --y: {{ y }}%"
+            data-origin-pin="{{ block.id }}"
+            aria-controls="Origin-{{ block.id }}"
+            aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
+            {{ block.shopify_attributes }}
+          >
+            {% render 'icon', name: 'pin' %}
+            <span class="origin-pin__label">{{ block.settings.country }}</span>
+          </button>
+        {%- endfor -%}
+      </div>
+
+      <div class="origin-map__cards">
+        {%- for block in section.blocks -%}
+          <article
+            class="origin-card"
+            id="Origin-{{ block.id }}"
+            data-origin-card="{{ block.id }}"
+            {% unless forloop.first %}hidden{% endunless %}
+          >
+            <p class="eyebrow">{{ block.settings.country }} · {{ block.settings.altitude }}</p>
+            <h3>{{ block.settings.farm }}</h3>
+            <div class="rte">{{ block.settings.story }}</div>
+            {%- if block.settings.product != blank -%}
+              <a class="link-arrow" href="{{ block.settings.product.url }}">
+                Taste it: {{ block.settings.product.title }} {% render 'icon', name: 'arrow' %}
+              </a>
+            {%- endif -%}
+          </article>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Origin map",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Where it grows" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Meet the coffee belt" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Every bean we roast is traceable to a farm or washing station. Tap a pin." }
+  ],
+  "blocks": [
+    {
+      "type": "origin",
+      "name": "Origin",
+      "settings": [
+        { "type": "text", "id": "country", "label": "Country", "default": "Ethiopia" },
+        { "type": "text", "id": "farm", "label": "Farm / station", "default": "Konga Washing Station" },
+        { "type": "text", "id": "altitude", "label": "Altitude", "default": "1,950 masl" },
+        { "type": "range", "id": "latitude", "label": "Latitude", "min": -40, "max": 40, "step": 1, "default": 6 },
+        { "type": "range", "id": "longitude", "label": "Longitude", "min": -180, "max": 180, "step": 4, "default": 40 },
+        { "type": "richtext", "id": "story", "label": "Story", "default": "<p>Smallholders deliver ripe cherry by hand; it is washed and dried on raised beds for 12 days.</p>" },
+        { "type": "product", "id": "product", "label": "Linked coffee" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Origin map",
+      "blocks": [
+        { "type": "origin", "settings": { "country": "Ethiopia", "farm": "Konga Washing Station", "latitude": 6, "longitude": 40 } },
+        { "type": "origin", "settings": { "country": "Colombia", "farm": "Finca La Esperanza", "altitude": "1,750 masl", "latitude": 2, "longitude": -76 } },
+        { "type": "origin", "settings": { "country": "Brazil", "farm": "Fazenda Santa Inês", "altitude": "1,150 masl", "latitude": -22, "longitude": -48 } }
+      ]
+    }
+  ]
+}
+{% endschema %}

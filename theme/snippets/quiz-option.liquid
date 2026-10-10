@@ -1,0 +1,9 @@
+{%- comment -%}
+  A single quiz answer rendered as a radio card.
+  Accepts: name, value, label, hint
+{%- endcomment -%}
+<label class="quiz-option">
+  <input type="radio" name="{{ name }}" value="{{ value }}" class="visually-hidden">
+  <span class="quiz-option__label">{{ label }}</span>
+  {%- if hint != blank -%}<span class="quiz-option__hint">{{ hint }}</span>{%- endif -%}
+</label>

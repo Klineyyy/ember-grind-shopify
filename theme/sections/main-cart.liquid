@@ -1,0 +1,55 @@
+<section class="page-width cart-page">
+  <h1>{{ 'cart.title' | t }}</h1>
+
+  {%- if cart.item_count > 0 -%}
+    <div class="cart-page__layout">
+      <div>
+        {% render 'free-shipping-bar' %}
+        <ul class="cart-lines cart-lines--page">
+          {%- for item in cart.items -%}
+            {% render 'cart-line', item: item, index: forloop.index %}
+          {%- endfor -%}
+        </ul>
+      </div>
+
+      <form action="{{ routes.cart_url }}" method="post" class="cart-summary" novalidate>
+        {%- if cart.attributes['Brew profile'] != blank -%}
+          <div class="cart-summary__profile">
+            <p class="eyebrow">Your brew profile</p>
+            <p><strong>{{ cart.attributes['Brew profile'] }}</strong></p>
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.show_note -%}
+          <label for="CartNote">{{ 'cart.note' | t }}</label>
+          <textarea id="CartNote" name="note" rows="3" placeholder="Gift message, grind tweaks…">{{ cart.note }}</textarea>
+        {%- endif -%}
+
+        {%- for discount in cart.discount_applications -%}
+          <p class="cart-discount">{{ discount.title }} <span>−{{ discount.total_allocated_amount | money }}</span></p>
+        {%- endfor -%}
+        <p class="cart-total">
+          <span>{{ 'cart.subtotal' | t }}</span>
+          <strong>{{ cart.total_price | money }}</strong>
+        </p>
+        <p class="cart-taxes">{{ 'cart.taxes' | t }}</p>
+        <button type="submit" name="checkout" class="button button--ember button--block button--large">{{ 'cart.checkout' | t }}</button>
+        <a class="cart-drawer__view" href="{{ routes.all_products_collection_url }}">{{ 'cart.continue' | t }}</a>
+      </form>
+    </div>
+  {%- else -%}
+    <div class="cart-empty cart-empty--page">
+      <p>{{ 'cart.empty' | t }}</p>
+      <a class="button button--ember" href="{{ routes.all_products_collection_url }}">{{ 'general.shop_all' | t }}</a>
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Cart",
+  "settings": [
+    { "type": "checkbox", "id": "show_note", "label": "Show order note", "default": true }
+  ]
+}
+{% endschema %}

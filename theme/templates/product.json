@@ -1,0 +1,20 @@
+{
+  "sections": {
+    "main": { "type": "main-product", "settings": { "show_roast_date": true } },
+    "flavor": { "type": "flavor-profile", "settings": {} },
+    "brew": {
+      "type": "brew-guide",
+      "blocks": {
+        "pourover": { "type": "method", "settings": { "method": "Pour-over" } },
+        "espresso": { "type": "method", "settings": { "method": "Espresso", "grind": "Fine", "ratio": "1 : 2", "temperature": "93 °C", "time": "0:28", "steps": "<ol><li>Dose 18 g into a warm basket.</li><li>Distribute and tamp level.</li><li>Pull 36 g in 26–30 seconds.</li></ol>" } }
+      },
+      "block_order": ["pourover", "espresso"],
+      "settings": { "eyebrow": "Brew it right", "heading": "Our recipe for this coffee" }
+    },
+    "related": {
+      "type": "featured-collection",
+      "settings": { "eyebrow": "Keep exploring", "heading": "You might also like", "collection": "coffee", "limit": 4 }
+    }
+  },
+  "order": ["main", "flavor", "brew", "related"]
+}

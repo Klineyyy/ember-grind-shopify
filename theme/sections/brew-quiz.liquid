@@ -1,0 +1,177 @@
+{%- comment -%}
+  Brew Profile quiz + sampler builder.
+
+  Liquid serialises the coffee collection (with its flavour metafields) into a
+  JSON island; brew-quiz.js scores every coffee against the answers on the
+  client, explains *why* each one matched, and adds the top three as a
+  discounted sampler in a single /cart/add.js call.
+{%- endcomment -%}
+{%- assign coffees = section.settings.collection -%}
+{%- assign gear = section.settings.gear_collection -%}
+
+<section class="section brew-quiz" id="brew-quiz" data-brew-quiz data-discount-code="{{ section.settings.discount_code | escape }}">
+  <div class="page-width brew-quiz__inner">
+    <header class="brew-quiz__intro">
+      <p class="eyebrow eyebrow--light">{{ section.settings.eyebrow }}</p>
+      <h2>{{ section.settings.heading }}</h2>
+      <p>{{ section.settings.subheading }}</p>
+    </header>
+
+    <div class="quiz-card">
+      <div class="quiz-progress" aria-hidden="true"><span data-quiz-progress></span></div>
+
+      <form class="quiz-steps" data-quiz-form novalidate>
+        <fieldset class="quiz-step is-active" data-step="method">
+          <legend>How do you brew at home?</legend>
+          <div class="quiz-options">
+            {%- render 'quiz-option', name: 'method', value: 'espresso', label: 'Espresso machine', hint: 'Short, intense, maybe a flat white' -%}
+            {%- render 'quiz-option', name: 'method', value: 'pour-over', label: 'Pour-over', hint: 'V60, Chemex, Kalita' -%}
+            {%- render 'quiz-option', name: 'method', value: 'french-press', label: 'French press', hint: 'Full-bodied, no fuss' -%}
+            {%- render 'quiz-option', name: 'method', value: 'moka', label: 'Moka pot', hint: 'Stovetop, Italian style' -%}
+            {%- render 'quiz-option', name: 'method', value: 'drip', label: 'Drip machine', hint: 'Batch brew for the household' -%}
+          </div>
+        </fieldset>
+
+        <fieldset class="quiz-step" data-step="flavor">
+          <legend>Which cup sounds best?</legend>
+          <div class="quiz-options">
+            {%- render 'quiz-option', name: 'flavor', value: 'fruity', label: 'Bright & fruity', hint: 'Berries, citrus, florals' -%}
+            {%- render 'quiz-option', name: 'flavor', value: 'chocolatey', label: 'Chocolatey & nutty', hint: 'Cocoa, hazelnut, caramel' -%}
+            {%- render 'quiz-option', name: 'flavor', value: 'bold', label: 'Bold & smoky', hint: 'Dark chocolate, toasted, heavy' -%}
+            {%- render 'quiz-option', name: 'flavor', value: 'balanced', label: 'Sweet & balanced', hint: 'Nothing too wild, just good' -%}
+          </div>
+        </fieldset>
+
+        <fieldset class="quiz-step" data-step="milk">
+          <legend>Milk in your coffee?</legend>
+          <div class="quiz-options">
+            {%- render 'quiz-option', name: 'milk', value: 'black', label: 'Always black', hint: 'I want to taste the bean' -%}
+            {%- render 'quiz-option', name: 'milk', value: 'sometimes', label: 'Sometimes', hint: 'Depends on the day' -%}
+            {%- render 'quiz-option', name: 'milk', value: 'milk', label: 'Milk or oat, always', hint: 'Lattes, flat whites, cortados' -%}
+          </div>
+        </fieldset>
+
+        <fieldset class="quiz-step" data-step="caffeine">
+          <legend>Caffeine?</legend>
+          <div class="quiz-options">
+            {%- render 'quiz-option', name: 'caffeine', value: 'regular', label: 'Full power', hint: 'Regular caffeine' -%}
+            {%- render 'quiz-option', name: 'caffeine', value: 'decaf', label: 'Decaf', hint: 'All flavour, no jitters' -%}
+            {%- render 'quiz-option', name: 'caffeine', value: 'either', label: 'Mix it up', hint: 'Happy with either' -%}
+          </div>
+        </fieldset>
+
+        <fieldset class="quiz-step" data-step="grinder">
+          <legend>Do you own a grinder?</legend>
+          <div class="quiz-options">
+            {%- render 'quiz-option', name: 'grinder', value: 'yes', label: 'Yes, send whole beans', hint: 'Freshest possible cup' -%}
+            {%- render 'quiz-option', name: 'grinder', value: 'no', label: 'No, grind it for me', hint: 'We’ll match the grind to your brewer' -%}
+          </div>
+        </fieldset>
+
+        <div class="quiz-nav">
+          <button type="button" class="button button--ghost" data-quiz-back disabled>Back</button>
+          <span class="quiz-nav__count" data-quiz-count aria-live="polite"></span>
+        </div>
+      </form>
+
+      <div class="quiz-results" data-quiz-results hidden>
+        <div class="quiz-results__head">
+          <div>
+            <p class="eyebrow">Your brew profile</p>
+            <h3 data-quiz-profile-title></h3>
+            <p class="quiz-results__summary" data-quiz-profile-summary></p>
+          </div>
+          <button type="button" class="button button--ghost" data-quiz-restart>Retake</button>
+        </div>
+
+        <ol class="match-list" data-quiz-matches></ol>
+
+        <div class="sampler" data-sampler>
+          <div>
+            <p class="sampler__title">Try all three: ground for <span data-sampler-grind></span></p>
+            <p class="sampler__meta">
+              <span data-sampler-total></span>
+              {%- if section.settings.discount_code != blank -%}
+                · <strong>{{ section.settings.discount_label }}</strong> when you buy all three
+              {%- endif -%}
+            </p>
+            <label class="sampler__gear" data-sampler-gear hidden>
+              <input type="checkbox" data-sampler-gear-input checked>
+              <span>Add <strong data-sampler-gear-title></strong> (<span data-sampler-gear-price></span>)</span>
+            </label>
+          </div>
+          <button type="button" class="button button--ember button--large" data-sampler-add>
+            Add all 3{% if section.settings.discount_label != blank %} · save {{ section.settings.discount_label | remove: ' off' }}{% endif %}
+          </button>
+        </div>
+        <p class="quiz-error" data-quiz-error role="alert" hidden></p>
+      </div>
+    </div>
+  </div>
+
+  <script type="application/json" data-quiz-catalog>
+    {
+      "coffees": [
+        {%- if coffees != blank -%}
+          {%- for product in coffees.products limit: 50 -%}
+            {%- assign c = product.metafields.coffee -%}
+            {
+              "id": {{ product.id }},
+              "title": {{ product.title | json }},
+              "url": {{ product.url | json }},
+              "image": {% if product.featured_image %}{{ product.featured_image | image_url: width: 400 | json }}{% else %}null{% endif %},
+              "origin": {{ c.origin.value | json }},
+              "roast": {{ c.roast_level.value | default: 3 }},
+              "decaf": {% if c.decaf.value == true %}true{% else %}false{% endif %},
+              "notes": {% if c.tasting_notes != blank %}{{ c.tasting_notes.value | json }}{% else %}[]{% endif %},
+              "methods": {% if c.brew_methods != blank %}{{ c.brew_methods.value | json }}{% else %}[]{% endif %},
+              "profile": {% if c.flavor_profile != blank %}{{ c.flavor_profile.value | json }}{% else %}null{% endif %},
+              "variants": [
+                {%- for variant in product.variants -%}
+                  {
+                    "id": {{ variant.id }},
+                    "available": {{ variant.available }},
+                    "price": {{ variant.price }},
+                    "options": {{ variant.options | json }}
+                  }{% unless forloop.last %},{% endunless %}
+                {%- endfor -%}
+              ]
+            }{% unless forloop.last %},{% endunless %}
+          {%- endfor -%}
+        {%- endif -%}
+      ],
+      "gear": [
+        {%- if gear != blank -%}
+          {%- for product in gear.products limit: 20 -%}
+            {
+              "id": {{ product.id }},
+              "title": {{ product.title | json }},
+              "tags": {{ product.tags | json }},
+              "variantId": {{ product.selected_or_first_available_variant.id }},
+              "available": {{ product.available }},
+              "price": {{ product.price }}
+            }{% unless forloop.last %},{% endunless %}
+          {%- endfor -%}
+        {%- endif -%}
+      ]
+    }
+  </script>
+</section>
+
+<script src="{{ 'brew-quiz.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Brew Profile quiz",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "60-second quiz" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Find your coffee" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Five questions. Three perfectly matched coffees, ground for your brewer." },
+    { "type": "collection", "id": "collection", "label": "Coffee collection", "info": "Products need the coffee.* metafields (roast_level, flavor_profile, tasting_notes, brew_methods)." },
+    { "type": "collection", "id": "gear_collection", "label": "Brewing gear collection", "info": "Tag gear with method:pour-over, method:espresso, etc. to recommend it." },
+    { "type": "text", "id": "discount_code", "label": "Sampler discount code", "default": "SAMPLER15" },
+    { "type": "text", "id": "discount_label", "label": "Discount label", "default": "15% off" }
+  ],
+  "presets": [{ "name": "Brew Profile quiz" }]
+}
+{% endschema %}

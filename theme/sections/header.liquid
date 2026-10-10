@@ -1,0 +1,75 @@
+{%- if section.settings.announcement != blank -%}
+  <div class="announcement">
+    <p>{{ section.settings.announcement }}</p>
+  </div>
+{%- endif -%}
+
+<header class="site-header">
+  <div class="site-header__inner page-width">
+    <details class="mobile-nav">
+      <summary class="icon-button" aria-label="{{ 'accessibility.open_menu' | t }}">
+        {% render 'icon', name: 'menu' %}
+      </summary>
+      <nav class="mobile-nav__panel">
+        <ul>
+          {%- for link in section.settings.menu.links -%}
+            <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    </details>
+
+    <a href="{{ routes.root_url }}" class="logo">
+      <span class="logo__mark" aria-hidden="true">{% render 'icon', name: 'bean' %}</span>
+      <span class="logo__text">{{ shop.name }}</span>
+    </a>
+
+    <nav class="primary-nav" aria-label="Primary">
+      <ul>
+        {%- for link in section.settings.menu.links -%}
+          <li>
+            <a href="{{ link.url }}"{% if link.active %} aria-current="page"{% endif %}>{{ link.title }}</a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+
+    <div class="site-header__actions">
+      <a class="icon-button" href="{{ routes.search_url }}" aria-label="{{ 'general.search' | t }}">
+        {% render 'icon', name: 'search' %}
+      </a>
+      <a
+        class="icon-button cart-toggle"
+        href="{{ routes.cart_url }}"
+        data-cart-toggle
+        aria-label="{{ 'accessibility.open_cart' | t }}"
+      >
+        {% render 'icon', name: 'bag' %}
+        <span class="cart-count" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>
+          {{- cart.item_count -}}
+        </span>
+      </a>
+    </div>
+  </div>
+</header>
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "section-header",
+  "settings": [
+    {
+      "type": "text",
+      "id": "announcement",
+      "label": "Announcement",
+      "default": "Roasted every Tuesday · Free shipping over $50"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu"
+    }
+  ]
+}
+{% endschema %}
