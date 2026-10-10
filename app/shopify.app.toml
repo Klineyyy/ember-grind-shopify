@@ -1,0 +1,35 @@
+# Restock Radar — Shopify app configuration.
+# https://shopify.dev/docs/apps/tools/cli/configuration
+# application_url / redirect_urls are rewritten to the dev tunnel by `shopify app dev`.
+
+client_id = "4f4f25a095f7d07b27d98aa458c81dcd"
+name = "Restock Radar"
+application_url = "https://example.com"
+embedded = true
+
+[build]
+include_config_on_deploy = true
+automatically_update_urls_on_dev = true
+
+[access_scopes]
+# read_* power the risk engine. write_inventory lets "Mark received" push stock
+# into Shopify. write_products / write_discounts / write_publications /
+# write_online_store_navigation are only used by the dev "Seed demo store" tool.
+scopes = "read_inventory,read_locations,read_online_store_navigation,read_orders,read_products,read_publications,write_discounts,write_inventory,write_online_store_navigation,write_products,write_publications"
+
+[auth]
+redirect_urls = [ "https://example.com/api/auth/callback" ]
+
+[webhooks]
+# Matches ApiVersion.July26 used by the backend (web/src/server/shopify.ts).
+api_version = "2026-07"
+
+  # orders/create requires the "Protected customer data access" declaration
+  # (Partner dashboard → App → API access requests). No customer fields needed.
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled", "orders/create", "inventory_levels/update" ]
+  uri = "/api/webhooks"
+
+  [[webhooks.subscriptions]]
+  compliance_topics = [ "customers/data_request", "customers/redact", "shop/redact" ]
+  uri = "/api/webhooks"
