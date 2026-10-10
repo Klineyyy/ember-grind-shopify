@@ -38,6 +38,19 @@
       <a class="icon-button" href="{{ routes.search_url }}" aria-label="{{ 'general.search' | t }}">
         {% render 'icon', name: 'search' %}
       </a>
+      {%- if shop.customer_accounts_enabled -%}
+        {%- if customer -%}
+          <a class="icon-button account-link" href="{{ routes.account_url }}" aria-label="{{ 'accessibility.my_account' | t }}">
+            <span class="account-link__avatar" aria-hidden="true">
+              {{- customer.first_name | default: customer.email | slice: 0 | upcase -}}
+            </span>
+          </a>
+        {%- else -%}
+          <a class="icon-button" href="{{ routes.account_login_url }}" aria-label="{{ 'accessibility.sign_in' | t }}">
+            {% render 'icon', name: 'account' %}
+          </a>
+        {%- endif -%}
+      {%- endif -%}
       <a
         class="icon-button cart-toggle"
         href="{{ routes.cart_url }}"

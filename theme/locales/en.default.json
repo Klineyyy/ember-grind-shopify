@@ -3,7 +3,9 @@
     "skip_to_content": "Skip to content",
     "close": "Close",
     "open_cart": "Open cart",
-    "open_menu": "Open menu"
+    "open_menu": "Open menu",
+    "sign_in": "Sign in",
+    "my_account": "My account and orders"
   },
   "general": {
     "shop_all": "Shop all coffee",

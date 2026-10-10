@@ -108,5 +108,5 @@ All child tables cascade from `shops`, which makes uninstall clean-up and GDPR `
 - **Background jobs** (BullMQ/queue) for syncs and rescoring, plus a nightly full reconcile; bulk operations API for large catalogs.
 - **Notifications:** daily digest email / Slack when something turns critical.
 - **Tests:** integration tests for services against a MySQL container, API contract tests, Playwright E2E for the embedded app and the theme quiz.
-- **Theme:** subscription app integration for the Roast Club, quiz results saved to the customer account, an account icon in the header, product reviews, and Shopify Functions for a true bundle discount instead of a discount code.
+- **Theme:** subscription app integration for the Roast Club, quiz results saved to the customer account, product reviews, and Shopify Functions for a true bundle discount instead of a discount code.
 - **Ops:** production deployment (Render/Fly + managed MySQL), structured logging, error tracking, rate-limit aware GraphQL client.
