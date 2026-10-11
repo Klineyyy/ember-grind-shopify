@@ -24,7 +24,7 @@ Theme constraints respected: Liquid + CSS + minimal vanilla JS (four small files
 2. **Explains every score** — the product page lists the points each factor contributed, so the merchant can trust (or argue with) the recommendation.
 3. **Recommends what to order and by when** — quantity rounded to the supplier's minimum order quantity, an *order-by* date, and the projected stockout date.
 4. **Turns recommendations into work.** One click creates draft restock plans (purchase orders), **grouped by supplier**, skipping anything already on an open plan. Plans move through a strict state machine (draft → ordered → received / cancelled); ordered units count as incoming stock (so risk drops immediately), and receiving can push the units into Shopify inventory.
-5. **Alerts** open, escalate and auto-resolve as conditions change (stockout risk, out of stock, sales spike, overstock).
+5. **Alerts that mean “act today”** — only critical stockout risk, out-of-stock with live demand, and sales spikes on stock that is already tight. They open and auto-resolve as conditions change. High/watch risk and overstock stay visible as tiers and KPIs instead of alerts: an early version alerted on every high-risk variant and produced 45 alerts for one store, which buried the real emergencies (QA finding).
 6. **History** — an activity log of every change with field-level diffs, append-only score history (sparklines), inventory snapshots and daily sales.
 7. **The other side of the coin:** cash tied up in overstock and products with stock but no demand.
 

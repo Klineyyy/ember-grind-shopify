@@ -106,7 +106,8 @@ export async function rescoreShop(shopId: number, onlyProductIds?: number[]) {
       });
     }
 
-    await syncAlerts(shopId, product.id, product.title, product.available, result);
+    const label = product.variantTitle ? `${product.title} (${product.variantTitle})` : product.title;
+    await syncAlerts(shopId, product.id, label, product.available, result);
   }
 
   return { scored: results.length };
@@ -130,20 +131,26 @@ export async function latestScoreByProduct(shopId: number) {
 async function syncAlerts(shopId: number, productId: number, title: string, available: number, r: RiskResult) {
   const wanted = new Map<AlertType, { severity: Severity; message: string }>();
 
+  // Alerts mean "act today". High/Watch tiers stay visible in the dashboard and
+  // product list but don't page the merchant — otherwise every variant of a
+  // slightly-low coffee raises its own alert and the real emergencies get lost.
   if (available <= 0 && r.velocity > 0) {
     wanted.set('out_of_stock', { severity: 'critical', message: `${title} is out of stock and losing ~${r.velocity.toFixed(1)} sales/day.` });
-  } else if (r.tier === 'critical' || r.tier === 'high') {
+  } else if (r.tier === 'critical') {
     wanted.set('stockout_risk', {
-      severity: r.tier === 'critical' ? 'critical' : 'warning',
+      severity: 'critical',
       message: `${title} runs out around ${r.stockoutDate} (${r.daysOfCover} days of cover). Reorder ~${r.recommendedQty} units.`,
     });
   }
-  if (r.isSpike) {
-    wanted.set('velocity_spike', { severity: 'info', message: `${title} is selling ${(r.velocity7 / Math.max(r.velocity30, 0.01)).toFixed(1)}× faster this week.` });
+  // A spike only matters when it eats into stock that is already tight.
+  if (r.isSpike && (r.tier === 'critical' || r.tier === 'high' || r.tier === 'watch')) {
+    wanted.set('velocity_spike', {
+      severity: 'warning',
+      message: `${title} is selling ${(r.velocity7 / Math.max(r.velocity30, 0.01)).toFixed(1)}× faster this week — cover is shrinking.`,
+    });
   }
-  if (r.tier === 'overstock') {
-    wanted.set('overstock', { severity: 'info', message: `${title} has ${r.overstockUnits} units beyond ${r.daysOfCover} days of cover.` });
-  }
+  // Overstock is a planning signal, not an emergency: it is surfaced by the
+  // "cash tied in overstock" KPI and the overstock tier, never as an alert.
 
   const open = await db
     .select()
