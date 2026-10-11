@@ -4,6 +4,7 @@
  * Every mutation writes an activity_log entry in the same transaction.
  */
 import type { Session } from '@shopify/shopify-api';
+import { createHash } from 'node:crypto';
 import { and, asc, count, desc, eq, inArray } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { inventorySnapshots, products, restockPlanItems, restockPlans, suppliers, type PlanStatus } from '../db/schema.js';
@@ -232,12 +233,35 @@ export async function transitionPlan(
   return { plan: await getPlan(shopId, planId), inventory: inventoryResult };
 }
 
+// Since API 2026-04 inventoryAdjustQuantities requires an @idempotent key and a
+// compare-and-set `changeFromQuantity` on every change.
 const ADJUST_MUTATION = `#graphql
-  mutation ReceiveStock($input: InventoryAdjustQuantitiesInput!) {
-    inventoryAdjustQuantities(input: $input) {
+  mutation ReceiveStock($input: InventoryAdjustQuantitiesInput!, $key: String!) {
+    inventoryAdjustQuantities(input: $input) @idempotent(key: $key) {
       userErrors { field message }
     }
   }`;
+
+const CURRENT_LEVELS_QUERY = `#graphql
+  query CurrentLevels($ids: [ID!]!, $locationId: ID!) {
+    nodes(ids: $ids) {
+      ... on InventoryItem {
+        id
+        inventoryLevel(locationId: $locationId) { quantities(names: ["available"]) { quantity } }
+      }
+    }
+  }`;
+
+/**
+ * Deterministic UUID-shaped idempotency key. It includes the expected starting
+ * quantities, so a duplicate submit of the same receipt is deduplicated by Shopify,
+ * while a retry after stock moved (new starting quantities) is a distinct request.
+ */
+export function receiptIdempotencyKey(shop: string, planId: number, changes: { inventoryItemId: string; changeFromQuantity: number }[]) {
+  const fingerprint = changes.map((c) => `${c.inventoryItemId}@${c.changeFromQuantity}`).join(',');
+  const hex = createHash('sha256').update(`restock-radar:${shop}:plan:${planId}:receive:${fingerprint}`).digest('hex');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-a${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
+}
 
 async function pushReceiptToShopify(session: Session, plan: Awaited<ReturnType<typeof getPlan>>) {
   const client = new shopify.api.clients.Graphql({ session });
@@ -249,12 +273,24 @@ async function pushReceiptToShopify(session: Session, plan: Awaited<ReturnType<t
     const locationId = loc.data?.locations.nodes[0]?.id;
     if (!locationId) return { pushed: false, error: 'No active location found' };
 
-    const changes = plan.items
-      .filter((i) => i.product.inventoryItemId)
-      .map((i) => ({ delta: i.quantity, inventoryItemId: i.product.inventoryItemId!, locationId }));
+    const lines = plan.items.filter((i) => i.product.inventoryItemId);
+    const levels = await client.request<{
+      nodes: ({ id: string; inventoryLevel: { quantities: { quantity: number }[] } | null } | null)[];
+    }>(CURRENT_LEVELS_QUERY, { variables: { ids: lines.map((i) => i.product.inventoryItemId!), locationId } });
+    const current = new Map(
+      (levels.data?.nodes ?? []).filter((n) => n?.id).map((n) => [n!.id, n!.inventoryLevel?.quantities[0]?.quantity ?? 0])
+    );
+
+    const changes = lines.map((i) => ({
+      delta: i.quantity,
+      changeFromQuantity: current.get(i.product.inventoryItemId!) ?? 0,
+      inventoryItemId: i.product.inventoryItemId!,
+      locationId,
+    }));
     const res = await client.request<{ inventoryAdjustQuantities: { userErrors: { message: string }[] } }>(ADJUST_MUTATION, {
       variables: {
         input: { reason: 'received', name: 'available', referenceDocumentUri: `restock-radar://plans/${plan.id}`, changes },
+        key: receiptIdempotencyKey(session.shop, plan.id, changes),
       },
     });
     const errors = res.data?.inventoryAdjustQuantities.userErrors ?? [];
