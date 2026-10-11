@@ -89,9 +89,11 @@ export function ProductDetailPage() {
           </s-section>
 
           <s-section heading="Units sold, last 30 days">
-            {data.isSimulated && <s-badge slot="secondary-actions" tone="info">Includes demo data</s-badge>}
             <SalesChart series={data.salesSeries} />
-            <s-text color="subdued">Darker bars are the last 7 days, which carry 60% of the velocity weight.</s-text>
+            <s-stack direction="inline" gap="small" alignItems="center">
+              <s-text color="subdued">Darker bars are the last 7 days, which carry 60% of the velocity weight.</s-text>
+              {data.isSimulated && <s-badge tone="info">Includes demo data</s-badge>}
+            </s-stack>
           </s-section>
 
           <s-section heading="Risk score history">

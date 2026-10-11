@@ -72,7 +72,9 @@ export function DashboardPage() {
         </s-section>
 
         <s-section heading="Highest risk right now" padding="none">
-          <s-link slot="secondary-actions" href="/products">View all products</s-link>
+          <s-button slot="secondary-actions" variant="tertiary" onClick={() => navigate('/products')}>
+            View all products
+          </s-button>
           {data.topRisks.length === 0 ? (
             <s-box padding="base">
               <s-text color="subdued">Nothing at risk. Every tracked product has enough stock to cover its lead time.</s-text>
@@ -134,7 +136,9 @@ export function DashboardPage() {
           </s-section>
 
           <s-section heading="Recent activity">
-            <s-link slot="secondary-actions" href="/activity">Full log</s-link>
+            <s-button slot="secondary-actions" variant="tertiary" onClick={() => navigate('/activity')}>
+              Full log
+            </s-button>
             <ActivityTimeline items={data.activity} compact />
           </s-section>
         </s-grid>

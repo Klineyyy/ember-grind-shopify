@@ -5,7 +5,7 @@
  */
 import type { Session } from '@shopify/shopify-api';
 import { createHash } from 'node:crypto';
-import { and, asc, count, desc, eq, inArray } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { inventorySnapshots, products, restockPlanItems, restockPlans, suppliers, type PlanStatus } from '../db/schema.js';
 import { shopify } from '../shopify.js';
@@ -28,9 +28,13 @@ export const TRANSITIONS: Record<PlanStatus, PlanStatus[]> = {
 
 type ItemInput = { productId: number; quantity: number; unitCost?: number | null; suggestedQty?: number | null };
 
+/** Next RR-#### for the shop: highest existing number + 1 (a row count would reuse numbers after deletes). */
 async function nextReference(shopId: number, tx: Pick<typeof db, 'select'> = db) {
-  const [{ n }] = await tx.select({ n: count() }).from(restockPlans).where(eq(restockPlans.shopId, shopId));
-  return `RR-${String(n + 1).padStart(4, '0')}`;
+  const [{ max }] = await tx
+    .select({ max: sql<number | null>`MAX(CAST(SUBSTRING(${restockPlans.reference}, 4) AS UNSIGNED))` })
+    .from(restockPlans)
+    .where(eq(restockPlans.shopId, shopId));
+  return `RR-${String(Number(max ?? 0) + 1).padStart(4, '0')}`;
 }
 
 async function assertOwnsProducts(shopId: number, productIds: number[]) {
