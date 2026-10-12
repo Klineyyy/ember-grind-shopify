@@ -99,3 +99,8 @@ All child tables cascade from `shops`, which makes uninstall clean-up and GDPR `
 - **Heuristic, not a forecast.** A transparent weighted score beats a black-box model for a merchant deciding whether to trust it, but it doesn't model seasonality, promotions or lead-time variance.
 - **Theme fonts from Google Fonts.** Fraunces isn't in Shopify's font library; the `RemoteAsset` theme-check warning is disabled with a comment explaining why.
 - **Client-side quiz scoring.** Fast and needs no app proxy, but the catalog JSON is limited to one collection (50 products) — fine for a roaster, not for a huge catalog.
+
+## 6. What I'd improve with more time
+
+- Learn how to set up Shopify and embed an app with it.
+- Have a lot of research time to explore new development.
