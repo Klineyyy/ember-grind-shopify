@@ -63,7 +63,7 @@ docker compose up -d mysql            # MySQL on localhost:3306, db "restock_rad
 cd app/web
 npm install
 cp .env.example .env                  # DATABASE_URL=mysql://radar:radar@127.0.0.1:3306/restock_radar
-npm run db:migrate                    # applies drizzle/0000_init.sql
+npm run db:migrate                    # applies the SQL migrations in drizzle/
 ```
 
 ### 2. Create your own copy of the app in Shopify
@@ -105,11 +105,11 @@ The dashboard will then show a realistic mix of critical, high, watch, healthy a
 | Command | What it does |
 |---|---|
 | `npm run dev` | Server + Vite in one process (run by `shopify app dev`) |
-| `npm test` | Vitest — risk engine unit tests |
+| `npm test` | Vitest — risk engine and clearance suggestion unit tests |
 | `npm run typecheck` | `tsc --noEmit` over server and client |
 | `npm run build` / `npm start` | Production frontend build / start in production mode |
 | `npm run db:generate` | Generate a new migration after editing `src/server/db/schema.ts` |
-| `npm run db:migrate` | Apply migrations |
+| `npm run db:migrate` | Apply migrations (`0000_init`, `0001_clearance_discounts`) |
 | `npm run db:studio` | Drizzle Studio (browse the database) |
 | `npm run demo:packshots` | Re-render the demo product images (needs `npx playwright install chromium` once) |
 
@@ -118,7 +118,8 @@ The dashboard will then show a realistic mix of critical, high, watch, healthy a
 1. **Dashboard** → *Create restock plans*: one draft purchase order per supplier, pre-filled with recommended quantities.
 2. Open a plan → edit quantities → *Save items* → *Mark as ordered* (units now count as incoming; risk drops) → *Mark as received* (optionally adds the units to Shopify inventory).
 3. **Activity** shows every step with field-level changes.
-4. Place a test order on the storefront (Admin → *Settings → Payments* → activate **Test payment gateway**, card number `1`) and watch the product's sales and score update via webhooks.
+4. **Clearance**: open an overstocked product → *Create clearance discount* (or *Clearance → New clearance discount*), accept or adjust the suggested code and % off → *Create in Shopify*. The code works at checkout for those variants only; the Clearance page shows uses, sales and stock cleared.
+5. Place a test order on the storefront (Admin → *Settings → Payments* → activate **Test payment gateway**, card number `1`) and watch the product's sales and score update via webhooks.
 
 ---
 

@@ -51,15 +51,21 @@ export function ProductDetailPage() {
   return (
     <s-page heading={variantLabel(p)}>
       <s-link slot="breadcrumb-actions" href="/products">Products</s-link>
-      <s-button
-        slot="primary-action"
-        variant="primary"
-        disabled={!p.recommendedQty || onOpenPlan}
-        loading={generate.isPending}
-        onClick={() => generate.mutate([p.id], { onSuccess: (r) => r.plans[0] && navigate(`/plans/${r.plans[0].id}`) })}
-      >
-        {onOpenPlan ? 'Already on an open plan' : `Reorder ${p.recommendedQty || ''}`}
-      </s-button>
+      {p.tier === 'overstock' || p.tier === 'no_demand' ? (
+        <s-button slot="primary-action" variant="primary" onClick={() => navigate(`/clearance/new?products=${p.id}`)}>
+          Create clearance discount
+        </s-button>
+      ) : (
+        <s-button
+          slot="primary-action"
+          variant="primary"
+          disabled={!p.recommendedQty || onOpenPlan}
+          loading={generate.isPending}
+          onClick={() => generate.mutate([p.id], { onSuccess: (r) => r.plans[0] && navigate(`/plans/${r.plans[0].id}`) })}
+        >
+          {onOpenPlan ? 'Already on an open plan' : `Reorder ${p.recommendedQty || ''}`}
+        </s-button>
+      )}
 
       {data.alerts.map((a) => (
         <s-banner key={a.id} tone={a.severity === 'critical' ? 'critical' : a.severity === 'warning' ? 'warning' : 'info'}>

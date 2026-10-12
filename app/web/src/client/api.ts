@@ -74,6 +74,14 @@ export const useActivity = (filters: { entityType?: string; entityId?: number; b
       ),
   });
 
+export const useDiscounts = () => useQuery({ queryKey: ['discounts'], queryFn: () => api<T.ClearanceDiscount[]>('/discounts') });
+export const useClearanceSuggestion = (productIds: number[]) =>
+  useQuery({
+    queryKey: ['discount-suggestion', productIds],
+    queryFn: () => api<T.ClearanceSuggestion>(`/discounts/suggestion?productIds=${productIds.join(',')}`),
+    enabled: productIds.length > 0,
+  });
+
 /* ---------- Mutations ---------- */
 
 export const useSync = () =>
@@ -120,3 +128,13 @@ export const useSaveSettings = () =>
 
 export const useDevAction = () =>
   useApiMutation((action: 'seed-store' | 'demo-sales' | 'demo-suppliers') => api<unknown>(`/dev/${action}`, { method: 'POST' }));
+
+export const useCreateDiscount = () =>
+  useApiMutation(
+    (body: { code: string; percentOff: number; productIds: number[]; endsAt: string | null }) =>
+      api<{ id: number }>('/discounts', { method: 'POST', json: body }),
+    (_r, v) => `Created ${v.code.toUpperCase()} in Shopify`
+  );
+
+export const useEndDiscount = () =>
+  useApiMutation((id: number) => api(`/discounts/${id}/end`, { method: 'POST' }), () => 'Discount ended');

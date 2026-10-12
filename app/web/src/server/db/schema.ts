@@ -263,10 +263,50 @@ export const restockPlanItems = mysqlTable(
 );
 
 /* -------------------------------------------------------------------------- */
+/* Clearance discounts (turn overstock back into cash)                        */
+/* -------------------------------------------------------------------------- */
+
+/** A Shopify discount code created by the app for overstocked variants. */
+export const clearanceDiscounts = mysqlTable(
+  'clearance_discounts',
+  {
+    id: serial('id').primaryKey(),
+    shopId: bigint('shop_id', { mode: 'number', unsigned: true })
+      .notNull()
+      .references(() => shops.id, { onDelete: 'cascade' }),
+    shopifyDiscountId: varchar('shopify_discount_id', { length: 64 }).notNull(),
+    code: varchar('code', { length: 64 }).notNull(),
+    percentOff: int('percent_off').notNull(),
+    status: mysqlEnum('status', ['active', 'ended']).default('active').notNull(),
+    startsAt: timestamp('starts_at').notNull(),
+    endsAt: timestamp('ends_at'),
+    endedAt: timestamp('ended_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => [uniqueIndex('clearance_shop_code_uq').on(t.shopId, t.code), index('clearance_shop_status_idx').on(t.shopId, t.status)]
+);
+
+/** Variants covered by a clearance code, with their excess stock when it launched (to measure progress). */
+export const clearanceDiscountItems = mysqlTable(
+  'clearance_discount_items',
+  {
+    discountId: bigint('discount_id', { mode: 'number', unsigned: true })
+      .notNull()
+      .references(() => clearanceDiscounts.id, { onDelete: 'cascade' }),
+    productId: bigint('product_id', { mode: 'number', unsigned: true })
+      .notNull()
+      .references(() => products.id, { onDelete: 'cascade' }),
+    availableAtStart: int('available_at_start').notNull(),
+    excessAtStart: int('excess_at_start').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.discountId, t.productId] })]
+);
+
+/* -------------------------------------------------------------------------- */
 /* Activity log                                                               */
 /* -------------------------------------------------------------------------- */
 
-export const activityEntityTypes = ['plan', 'supplier', 'product', 'alert', 'sync', 'settings'] as const;
+export const activityEntityTypes = ['plan', 'supplier', 'product', 'alert', 'sync', 'settings', 'discount'] as const;
 export type ActivityEntityType = (typeof activityEntityTypes)[number];
 
 export const activityLog = mysqlTable(
@@ -335,6 +375,15 @@ export const alertsRelations = relations(alerts, ({ one }) => ({
 export const restockPlansRelations = relations(restockPlans, ({ one, many }) => ({
   supplier: one(suppliers, { fields: [restockPlans.supplierId], references: [suppliers.id] }),
   items: many(restockPlanItems),
+}));
+
+export const clearanceDiscountsRelations = relations(clearanceDiscounts, ({ many }) => ({
+  items: many(clearanceDiscountItems),
+}));
+
+export const clearanceDiscountItemsRelations = relations(clearanceDiscountItems, ({ one }) => ({
+  discount: one(clearanceDiscounts, { fields: [clearanceDiscountItems.discountId], references: [clearanceDiscounts.id] }),
+  product: one(products, { fields: [clearanceDiscountItems.productId], references: [products.id] }),
 }));
 
 export const restockPlanItemsRelations = relations(restockPlanItems, ({ one }) => ({

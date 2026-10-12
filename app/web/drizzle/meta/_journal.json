@@ -8,6 +8,13 @@
       "when": 1791288902457,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1791782463485,
+      "tag": "0001_clearance_discounts",
+      "breakpoints": true
     }
   ]
 }

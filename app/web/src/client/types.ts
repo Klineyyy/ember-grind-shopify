@@ -55,7 +55,7 @@ export interface Alert {
 export interface ActivityEntry {
   id: number;
   actor: 'merchant' | 'system' | 'webhook';
-  entityType: 'plan' | 'supplier' | 'product' | 'alert' | 'sync' | 'settings';
+  entityType: 'plan' | 'supplier' | 'product' | 'alert' | 'sync' | 'settings' | 'discount';
   entityId: number | null;
   action: string;
   summary: string;
@@ -152,4 +152,28 @@ export interface PlanItemInput {
   productId: number;
   quantity: number;
   unitCost?: number | null;
+}
+
+export interface ClearanceDiscount {
+  id: number;
+  code: string;
+  percentOff: number;
+  status: 'active' | 'ended';
+  shopifyStatus: string | null;
+  startsAt: string;
+  endsAt: string | null;
+  endedAt: string | null;
+  uses: number | null;
+  revenue: number | null;
+  unitsSoldSince: number;
+  excessAtStart: number;
+  stockCleared: number;
+  items: { productId: number; title: string; variantTitle: string | null; imageUrl: string | null; availableAtStart: number; availableNow: number }[];
+}
+
+export interface ClearanceSuggestion {
+  code: string;
+  percentOff: number;
+  excessUnits: number;
+  excessValue: number;
 }

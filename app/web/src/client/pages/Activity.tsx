@@ -10,11 +10,13 @@ const ICONS: Record<ActivityEntry['entityType'], string> = {
   alert: '⚠️',
   sync: '🔄',
   settings: '⚙️',
+  discount: '💸',
 };
 
 const LINKS: Partial<Record<ActivityEntry['entityType'], (id: number) => string>> = {
   plan: (id) => `/plans/${id}`,
   product: (id) => `/products/${id}`,
+  discount: () => '/clearance',
 };
 
 function formatChange(key: string, value: unknown): string | null {
@@ -81,6 +83,7 @@ export function ActivityPage() {
             <s-option value="plan">Restock plans</s-option>
             <s-option value="alert">Alerts</s-option>
             <s-option value="product">Product settings</s-option>
+            <s-option value="discount">Clearance discounts</s-option>
             <s-option value="supplier">Suppliers</s-option>
             <s-option value="sync">Syncs</s-option>
             <s-option value="settings">Settings</s-option>

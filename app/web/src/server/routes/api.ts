@@ -17,12 +17,14 @@ import {
   createPlansFromRecommendations,
   getPlan,
   listPlans,
-  PlanError,
   planToCsv,
   transitionPlan,
   updatePlan,
 } from '../services/plans.js';
 import { rescoreShop } from '../services/scoring.js';
+import { CODE_PATTERN } from '../services/clearance.js';
+import { createClearance, endClearance, listClearance, suggestClearance } from '../services/discounts.js';
+import { AppError } from '../services/errors.js';
 import { ensureShop, type Shop } from '../services/shops.js';
 import { syncShop } from '../services/sync.js';
 import type { Session } from '@shopify/shopify-api';
@@ -240,6 +242,48 @@ api.post('/alerts/:id/:action', async (req, res) => {
   res.json({ ok: true });
 });
 
+/* ---------------- Clearance discounts ---------------- */
+
+const productIdList = z
+  .string()
+  .optional()
+  .transform((v) => (v ? v.split(',').map(Number) : []))
+  .pipe(z.array(z.number().int().positive()).max(100));
+
+api.get('/discounts', async (_req, res) => {
+  const { shop, session } = ctx(res);
+  res.json(await listClearance(session, shop.id));
+});
+
+api.get('/discounts/suggestion', async (req, res) => {
+  const { productIds } = z.object({ productIds: productIdList }).parse(req.query);
+  res.json(await suggestClearance(ctx(res).shop.id, productIds));
+});
+
+api.post('/discounts', async (req, res) => {
+  const { shop, session } = ctx(res);
+  const body = z
+    .object({
+      code: z
+        .string()
+        .trim()
+        .transform((c) => c.toUpperCase())
+        .pipe(z.string().regex(CODE_PATTERN, 'Use 3–32 letters, numbers, dashes or underscores')),
+      percentOff: z.number().int().min(1).max(90),
+      productIds: z.array(z.number().int().positive()).min(1, 'Pick at least one product').max(100),
+      endsAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+    })
+    .parse(req.body);
+  const id = await createClearance(session, shop.id, body);
+  res.status(201).json({ id });
+});
+
+api.post('/discounts/:id/end', async (req, res) => {
+  const { shop, session } = ctx(res);
+  await endClearance(session, shop.id, id(req));
+  res.json({ ok: true });
+});
+
 /* ---------------- Activity ---------------- */
 
 api.get('/activity', async (req, res) => {
@@ -335,7 +379,7 @@ api.post('/dev/demo-suppliers', devOnly, async (_req, res) => {
 
 api.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   if (err instanceof z.ZodError) return res.status(422).json({ error: 'Validation failed', issues: err.issues });
-  if (err instanceof PlanError) return res.status(err.status).json({ error: err.message });
+  if (err instanceof AppError) return res.status(err.status).json({ error: err.message });
   console.error(err);
   res.status(500).json({ error: 'Something went wrong' });
 });

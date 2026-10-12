@@ -27,6 +27,7 @@ Theme constraints respected: Liquid + CSS + minimal vanilla JS (four small files
 5. **Alerts that mean “act today”** — only critical stockout risk, out-of-stock with live demand, and sales spikes on stock that is already tight. They open and auto-resolve as conditions change. High/watch risk and overstock stay visible as tiers and KPIs instead of alerts: an early version alerted on every high-risk variant and produced 45 alerts for one store, which buried the real emergencies (QA finding).
 6. **History** — an activity log of every change with field-level diffs, append-only score history (sparklines), inventory snapshots and daily sales.
 7. **The other side of the coin:** cash tied up in overstock and products with stock but no demand.
+8. **Clearance discounts** turn that overstock back into cash. From an overstocked variant (or the Clearance page) the merchant picks the variants to clear; the app suggests a code and how deep to go (10% just over the overstock threshold, 20% at 2×, 30% at 3× or with no sales — `services/clearance.ts`, unit tested), then creates a **real Shopify discount code** limited to exactly those variants. The Clearance page tracks each code: Shopify status, uses and sales with the code, units sold since launch, and how much of the excess stock has cleared. Codes can be ended early; everything is logged.
 
 It is not CRUD with a dashboard on top: the core of the app is a decision (“what should I reorder today?”) and a workflow to act on it.
 
@@ -84,6 +85,7 @@ Key decisions:
 | `risk_scores` | **Append-only** score history with the factor breakdown as JSON. Latest row per product = current score. A row is written only when score, tier or recommendation changes (or at most daily), so webhooks don't flood it. |
 | `alerts` | One open alert per (product, type); severity can escalate; resolved automatically when the condition clears. |
 | `restock_plans` / `restock_plan_items` | Purchase orders with a status enum and timestamps per transition. Items keep `suggested_qty` next to `quantity`, so you can see how far the merchant deviated from the recommendation. |
+| `clearance_discounts` / `clearance_discount_items` | Discount codes the app created in Shopify (GID, code, % off, dates, status) and the variants each covers. Items snapshot `available_at_start` and `excess_at_start`, so progress (“84 of 204 excess units cleared”) is measured against the moment the code launched. Added in migration `0001`. |
 | `activity_log` | Audit trail: actor (merchant / system / webhook), entity, action, summary and a JSON field-level diff. Written in the same transaction as the change it describes. |
 
 All child tables cascade from `shops`, which makes uninstall clean-up and GDPR `shop/redact` a single delete. Dates for daily buckets are `DATE` columns read as strings to avoid timezone drift.
@@ -91,7 +93,7 @@ All child tables cascade from `shops`, which makes uninstall clean-up and GDPR `
 ## 5. Tradeoffs
 
 - **Simulated sales for the demo.** A fresh development store has no order history, so the risk engine would have nothing to score. The demo tools generate deterministic Poisson-distributed sales (weekend bumps, a recent spike on two products), clearly flagged and never mixed over real orders. Real orders flow in via sync and the `orders/create` webhook.
-- **Extra write scopes** (`write_products`, `write_discounts`, `write_publications`, `write_online_store_navigation`) exist only so the dev seeder can build the demo store. In a production listing they would be removed; the app itself needs `read_products`, `read_inventory`, `read_orders`, `read_locations` and `write_inventory` (for receiving stock).
+- **Extra write scopes** (`write_products`, `write_publications`, `write_online_store_navigation`) exist only so the dev seeder can build the demo store; in a production listing they would be removed. The app itself needs `read_products`, `read_inventory`, `read_orders`, `read_locations`, `write_inventory` (receiving stock) and `write_discounts` (clearance codes).
 - **Protected customer data.** `orders/create` requires a protected-data declaration. The app only reads quantities and dates, stores no customer PII, and the sync degrades gracefully (catalog still syncs) if order access is denied.
 - **Synchronous rescoring.** Rescoring runs inline after a webhook or edit. It is fine at demo size (65 variants) but would move to a queue for large catalogs.
 - **Single-location assumption** for inventory webhooks (the payload is per location); the full sync sums all locations and reconciles.

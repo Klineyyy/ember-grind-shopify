@@ -10,14 +10,11 @@ import { db } from '../db/client.js';
 import { inventorySnapshots, products, restockPlanItems, restockPlans, suppliers, type PlanStatus } from '../db/schema.js';
 import { shopify } from '../shopify.js';
 import { diff, logActivity } from './activity.js';
+import { AppError } from './errors.js';
 import { addDays } from './riskEngine.js';
 import { latestScoreByProduct, rescoreShop } from './scoring.js';
 
-export class PlanError extends Error {
-  constructor(message: string, public status = 400) {
-    super(message);
-  }
-}
+export class PlanError extends AppError {}
 
 export const TRANSITIONS: Record<PlanStatus, PlanStatus[]> = {
   draft: ['ordered', 'cancelled'],

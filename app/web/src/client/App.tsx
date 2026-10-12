@@ -4,6 +4,8 @@ import { useSettings } from './api';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { CurrencyContext } from './components/ui';
 import { ActivityPage } from './pages/Activity';
+import { ClearancePage } from './pages/Clearance';
+import { ClearanceNewPage } from './pages/ClearanceNew';
 import { DashboardPage } from './pages/Dashboard';
 import { PlanDetailPage } from './pages/PlanDetail';
 import { PlansPage } from './pages/Plans';
@@ -42,6 +44,7 @@ export function App() {
         </s-link>
         <s-link href="/products">Products</s-link>
         <s-link href="/plans">Restock plans</s-link>
+        <s-link href="/clearance">Clearance</s-link>
         <s-link href="/suppliers">Suppliers</s-link>
         <s-link href="/activity">Activity</s-link>
         <s-link href="/settings">Settings</s-link>
@@ -53,6 +56,8 @@ export function App() {
           <Route path="/products/:id" element={<ProductDetailPage />} />
           <Route path="/plans" element={<PlansPage />} />
           <Route path="/plans/:id" element={<PlanDetailPage />} />
+          <Route path="/clearance" element={<ClearancePage />} />
+          <Route path="/clearance/new" element={<ClearanceNewPage />} />
           <Route path="/suppliers" element={<SuppliersPage />} />
           <Route path="/activity" element={<ActivityPage />} />
           <Route path="/settings" element={<SettingsPage />} />
